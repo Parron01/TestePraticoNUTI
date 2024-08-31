@@ -24,8 +24,8 @@ const HomePageComponent = () => {
     <Container>
       <Content>
       <Header>
-        <Title>Portal de Consulta de Contratos Públicos</Title>
-        <Subtitle>Bem-vindo ao sistema de consulta de contratos de órgãos públicos!</Subtitle>
+        <Title>Bem Vindo ao Portal de Consulta de Contratos Públicos!</Title>
+        <Subtitle>Clique no botão abaixo e acesse as informações de contratos.</Subtitle>
       </Header>
 
       <MainContent>
