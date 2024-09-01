@@ -62,6 +62,9 @@ export function ConsultaModal() {
                         value={cnpj}
                         onChange={(event) => setCnpj(event.target.value)}
                     />
+                    <label>
+                    <span>CNPJ de Exemplo= 03533064000146</span>
+                    </label>
                 </div>
                 <div className="form-group">
                     <label htmlFor="dataInicio">

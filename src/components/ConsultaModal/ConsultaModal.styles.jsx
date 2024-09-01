@@ -24,6 +24,15 @@ export const ConsultaModalContainer = styled.form`
     align-items: center;
     color: ${(props) => props.theme["gray-300"]}; 
   }
+  span{
+    font-size: small;
+    margin-bottom: 2rem;
+    margin-left: 1rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid ${(props) => props.theme["green-600"]};
+    border-radius: 5px;
+    color: ${(props) => props.theme["green-300"]};
+}
 `;
 
 export const SendButton = styled.button`
