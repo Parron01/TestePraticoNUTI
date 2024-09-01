@@ -11,7 +11,7 @@ function formatData(data) {
 }
 
 // Função para formatar CNPJ no formato xx.xxx.xxx/xxxx-xx
-function formatCnpj(cnpj) {
+export function formatCnpj(cnpj) {
     return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
 }
 
@@ -20,6 +20,7 @@ const ContratosContext = createContext({});
 
 export function ContratosProvider({ children }) {
     const [contratos, setContratos] = useState([]);
+    const [orgaoInfo, setOrgaoInfo] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [nomeConsulta, setNomeConsulta] = useState(""); // Adiciona estado para o nome da consulta
@@ -37,11 +38,11 @@ export function ContratosProvider({ children }) {
     // Função para criar a consulta e fazer a requisição
     async function handleCreateConsulta(cnpjOrgao, dataInicial, dataFinal) {
         try {
-            setIsLoading(true);
+            setIsLoading(true); // Inicia o estado de carregamento
             
-            const cnpjFormatado = formatCnpj(cnpjOrgao)
-            const dataInicialFormatada = formatData(dataInicial)
-            const dataFinalFormatada = formatData(dataFinal)
+            const cnpjFormatado = formatCnpj(cnpjOrgao);
+            const dataInicialFormatada = formatData(dataInicial);
+            const dataFinalFormatada = formatData(dataFinal);
             // Define o nome da consulta
             const nomeConsulta = `Consulta: ${cnpjFormatado} - de ${dataInicialFormatada} até ${dataFinalFormatada}`;
             setNomeConsulta(nomeConsulta);
@@ -56,13 +57,23 @@ export function ContratosProvider({ children }) {
                     valorInicial: contrato.valorInicial,
                 }));
                 setContratos(contratosObtidos);
+
+                // Armazena as informações do órgão, supondo que todos os contratos vêm do mesmo órgão
+                if (response.data.length > 0) {
+                    const orgao = response.data[0].orgaoEntidade;
+                    setOrgaoInfo({
+                        cnpj: orgao.cnpj,
+                        razaoSocial: orgao.razaoSocial,
+                        poderId: orgao.poderId,
+                        esferaId: orgao.esferaId,
+                    });
+                }
                 toast.success("Consulta realizada com sucesso!");
             }
         } catch (error) {
-            // O toast para os erros agora é tratado dentro de fetchContratos
             console.error("Erro ao buscar contratos:", error);
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Encerra o estado de carregamento
             handleCloseModal();
         }
     }
@@ -113,9 +124,10 @@ export function ContratosProvider({ children }) {
         <ContratosContext.Provider
             value={{
                 contratos,
+                orgaoInfo,
                 isModalOpen,
                 isLoading,
-                nomeConsulta, // Passa o nome da consulta para o contexto
+                nomeConsulta, 
                 handleOpenModal,
                 handleCloseModal,
                 handleCreateConsulta,

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { useContratos } from '../../hooks/useContratos';
+import { formatCnpj, useContratos } from '../../hooks/useContratos';
 import {
   TableContainer,
   Title,
   Description,
+  OrgaoInfo,
   Table,
   TableHeader,
   TableHeaderRow,
@@ -17,7 +18,7 @@ import {
 } from './ContratoTable.styles';
 
 const ContratoTable = () => {
-  const { contratos, nomeConsulta } = useContratos();
+  const { contratos, nomeConsulta, orgaoInfo } = useContratos();
   const [paginaAtual, setPaginaAtual] = useState(1);
   const contratosPorPagina = 5;
 
@@ -45,6 +46,13 @@ const ContratoTable = () => {
   return (
     <TableContainer>
       <Title>{nomeConsulta || "Consulta"}</Title>
+      {orgaoInfo && (
+        <OrgaoInfo>
+          <p>Órgão: {orgaoInfo.razaoSocial} (CNPJ: {formatCnpj(orgaoInfo.cnpj)})</p>
+          <p>Poder: {orgaoInfo.poderId}</p>
+          <p>Esfera: {orgaoInfo.esferaId}</p>
+        </OrgaoInfo>
+      )}
       <Description>Esta tabela exibe os contratos associados ao CNPJ informado.</Description>
       <Table>
         <TableHeader>
@@ -77,7 +85,6 @@ const ContratoTable = () => {
         </tfoot>
       </Table>
 
-      {/* Componentes de Paginação */}
       <PaginationContainer>
         <PaginationButton onClick={handlePaginaAnterior} disabled={paginaAtual === 1}>
           Anterior

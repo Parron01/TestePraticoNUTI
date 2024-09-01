@@ -28,6 +28,16 @@ export const Title = styled.h2`
   margin-bottom: 0.5rem;
 `;
 
+export const OrgaoInfo = styled.div`
+  font-size: 1rem;
+  color: ${(props) => props.theme['gray-700']};
+  margin-bottom: 1rem;
+
+  p {
+    margin: 0.25rem 0;
+  }
+`;
+
 export const Description = styled.p`
   font-size: 1rem;
   color: ${(props) => props.theme['gray-700']};
