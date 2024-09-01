@@ -29,10 +29,10 @@ export const ConsultaModalContainer = styled.form`
 export const SendButton = styled.button`
   width: 100%;
   padding: 0.75rem;
-  background-color: ${(props) => props.theme["blue-600"]}; 
-  color: ${(props) => props.theme["white"]}; 
+  background-color: ${(props) => props.theme["blue-600"]};
+  color: ${(props) => props.theme["white"]};
   border: ${(props) => props.theme["blue-500"]};
-  border-radius: 0.5rem; 
+  border-radius: 0.5rem;
   font-size: 1.3rem;
   margin-top: 1.5rem;
   
@@ -46,5 +46,28 @@ export const SendButton = styled.button`
     color: ${(props) => props.theme["white"]};
     transition: background-color 0.3s ease;
     background-color: ${(props) => props.theme["blue-500"]};
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+export const LoadingSpinner = styled.div`
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;

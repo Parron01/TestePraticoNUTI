@@ -1,6 +1,7 @@
 import Modal from "react-modal";
 import {
     ConsultaModalContainer,
+    LoadingSpinner,
     SendButton,
 } from "./ConsultaModal.styles";
 import { IoMdClose } from "react-icons/io";
@@ -8,12 +9,12 @@ import { FaBuilding, FaCalendarAlt } from "react-icons/fa";
 import { useContratos } from "../../hooks/useContratos";
 import { useState } from "react";
 
-
 export function ConsultaModal() {
     const {
         isModalOpen,
         handleCloseModal,
         handleCreateConsulta,
+        isLoading,
     } = useContratos();
 
     const [cnpj, setCnpj] = useState("");
@@ -23,13 +24,11 @@ export function ConsultaModal() {
     async function handleConsultar(event) {
         event.preventDefault();
 
-        // Formatação das datas para o formato necessário
         const dataInicioFormatada = dataInicio.replace(/-/g, "");
         const dataFimFormatada = dataFim.replace(/-/g, "");
 
         await handleCreateConsulta(cnpj, dataInicioFormatada, dataFimFormatada);
 
-        // Limpa os campos do formulário após a consulta
         setCnpj("");
         setDataInicio("");
         setDataFim("");
@@ -88,8 +87,9 @@ export function ConsultaModal() {
                         onChange={(event) => setDataFim(event.target.value)}
                     />
                 </div>
-                <SendButton type="submit">
-                    Consultar
+                <SendButton type="submit" disabled={isLoading}>
+                    {isLoading ? "Carregando..." : "Consultar"}
+                    {isLoading && <LoadingSpinner />}
                 </SendButton>
             </ConsultaModalContainer>
         </Modal>
