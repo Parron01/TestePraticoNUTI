@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 import {
@@ -18,16 +18,19 @@ import {
 import { useConsultas } from '../../hooks/useConsultas';
 
 const HistoricoConsultasTable = () => {
-  const { consultas = [], deleteConsulta } = useConsultas();
+  const { listaConsultas = [], deletarConsulta, isLoading , carregarConsultas} = useConsultas();
   const [paginaAtual, setPaginaAtual] = useState(1);
   const consultasPorPagina = 5;
   const navigate = useNavigate();
 
-  // Lógica para obter as consultas da página atual
-  const indiceInicial = (paginaAtual - 1) * consultasPorPagina;
-  const consultasPaginaAtual = consultas.slice(indiceInicial, indiceInicial + consultasPorPagina);
+  useEffect(() => {
+    carregarConsultas();
+  }, []);
 
-  const totalPaginas = Math.ceil(consultas.length / consultasPorPagina);
+  const indiceInicial = (paginaAtual - 1) * consultasPorPagina;
+  const consultasPaginaAtual = listaConsultas.slice(indiceInicial, indiceInicial + consultasPorPagina);
+
+  const totalPaginas = Math.ceil(listaConsultas.length / consultasPorPagina);
 
   const handlePaginaAnterior = () => {
     if (paginaAtual > 1) {
@@ -42,12 +45,18 @@ const HistoricoConsultasTable = () => {
   };
 
   const handleConsultaClick = (consultaId) => {
-    navigate(`/contratos?consultaId=${consultaId}`);
+    navigate('/contratos', { state: { consultaId } });
   };
 
   const handleDeleteClick = (consultaId) => {
-    deleteConsulta(consultaId);
+    if (window.confirm("Tem certeza que deseja deletar esta consulta?")) {
+      deletarConsulta(consultaId);
+    }
   };
+
+  if (isLoading) {
+    return <p>Carregando...</p>;
+  }
 
   return (
     <TableContainer>
@@ -57,19 +66,25 @@ const HistoricoConsultasTable = () => {
         <TableHeader>
           <TableHeaderRow>
             <TableCell>Nome da Consulta</TableCell>
+            <TableCell>CNPJ</TableCell>
             <TableCell>Ações</TableCell>
           </TableHeaderRow>
         </TableHeader>
         <TableBody>
           {consultasPaginaAtual.map((consulta, index) => (
-            <TableRow key={index} onClick={() => handleConsultaClick(consulta.id)}>
+            <TableRow
+              key={index}
+              onClick={() => handleConsultaClick(consulta.id)}
+              title="Clique para ver mais informações"
+            >
               <TableCell>{consulta.nomeConsulta}</TableCell>
-              <TableCell>
+              <TableCell>{consulta.cnpj}</TableCell>
+              <TableCell className="centered">
                 <DeleteButton onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteClick(consulta.id);
                 }}>
-                  <FaTrash />
+                  <FaTrash size={24} />
                 </DeleteButton>
               </TableCell>
             </TableRow>
@@ -77,7 +92,6 @@ const HistoricoConsultasTable = () => {
         </TableBody>
       </Table>
 
-      {/* Componentes de Paginação */}
       <PaginationContainer>
         <PaginationButton onClick={handlePaginaAnterior} disabled={paginaAtual === 1}>
           Anterior

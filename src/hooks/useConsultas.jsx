@@ -1,34 +1,53 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 // Estrutura para armazenar dados das consultas
 const ConsultasContext = createContext({});
 
 export function ConsultasProvider({ children }) {
-    const [consultas, setConsultas] = useState([]);
+    const [listaConsultas, setListaConsultas] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Dados fictícios para teste
-    useEffect(() => {
-        const dadosFicticios = [
-            {
-                id: 1,
-                nomeConsulta: "Consulta: 12345678000195 - de 2024-08-01 até 2024-08-30",
-            }
-        ];
-        console.log("Adicionando dados fictícios:", dadosFicticios); // Adicionando log para verificar
-        setConsultas(dadosFicticios);
-    }, []);
+    // Função para buscar todas as consultas do back-end
+    async function carregarConsultas() {
+        setIsLoading(true);
+        try {
+            const response = await axios.get("http://localhost:8080/api/consultas");
+            const consultasFormatadas = response.data.map((consulta) => ({
+                id: consulta.id,
+                nomeConsulta: consulta.nomeConsulta,
+                cnpj: consulta.cnpj,
+            }));
+            setListaConsultas(consultasFormatadas);
+        } catch (error) {
+            console.error("Erro ao carregar consultas:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
-    // Função para deletar uma consulta (a ser implementada)
-    function deleteConsulta(consultaId) {
-        // Lógica para deletar uma consulta
-        setConsultas((prevConsultas) => prevConsultas.filter(consulta => consulta.id !== consultaId));
+    // Função para deletar uma consulta do back-end
+    async function deletarConsulta(consultaId) {
+        try {
+            await axios.delete(`http://localhost:8080/api/consultas/${consultaId}`);
+            setListaConsultas((prevConsultas) =>
+                prevConsultas.filter((consulta) => consulta.id !== consultaId)
+            );
+            toast.success("Consulta deletada com sucesso.");
+        } catch (error) {
+            console.error("Erro ao deletar consulta:", error);
+            toast.error("Erro ao deletar a consulta.");
+        }
     }
 
     return (
         <ConsultasContext.Provider
             value={{
-                consultas,
-                deleteConsulta,
+                listaConsultas,
+                isLoading,
+                deletarConsulta,
+                carregarConsultas
             }}
         >
             {children}

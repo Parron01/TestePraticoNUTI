@@ -64,6 +64,10 @@ export const TableCell = styled.td`
   @media (max-width: 768px) {
     padding: 0.75rem;
   }
+
+  &.centered {
+    text-align: center;
+  }
 `;
 
 export const PaginationContainer = styled.div`
@@ -99,9 +103,7 @@ export const DeleteButton = styled.button`
   &:hover {
     color: ${(props) => props.theme['red-700']};
   }
-  
 `;
-
 export const Description = styled.p`
   font-size: 1rem;
   color: ${(props) => props.theme['gray-700']};
