@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatCnpj, useContratos } from '../../hooks/useContratos';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
   TableContainer,
   Title,
@@ -17,19 +19,77 @@ import {
   PaginationButton,
 } from './ContratoTable.styles';
 
+const mapPoderIdToName = (poderId) => {
+  switch (poderId) {
+    case 'L':
+      return 'Legislativo';
+    case 'E':
+      return 'Executivo';
+    case 'J':
+      return 'Judiciário';
+    default:
+      return poderId;
+  }
+};
+
+const mapEsferaIdToName = (esferaId) => {
+  switch (esferaId) {
+    case 'F':
+      return 'Federal';
+    case 'E':
+      return 'Estadual';
+    case 'M':
+      return 'Municipal';
+    case 'D':
+      return 'Distrital';
+    default:
+      return esferaId;
+  }
+};
+
 const ContratoTable = () => {
-  const { contratos, nomeConsulta, orgaoInfo } = useContratos();
+  const {
+    listaContratos,
+    nomeConsulta,
+    informacoesOrgao,
+    fetchConsultaById,
+    setListaContratos,
+    setNomeConsulta,
+    setInformacoesOrgao,
+  } = useContratos();
+
   const [paginaAtual, setPaginaAtual] = useState(1);
   const contratosPorPagina = 5;
+  const location = useLocation();
+  const consultaId = location.state?.consultaId;
+  const navigate = useNavigate();
 
-  // Cálculo do valor total dos contratos
-  const valorTotal = contratos.reduce((total, contrato) => total + contrato.valorInicial, 0);
+  // Chamar a função fetchConsultaById fora do useEffect
+  if (consultaId) {
+    fetchConsultaById(consultaId)
+      .then((consultaData) => {
+        setListaContratos(consultaData.contratos);
+        setNomeConsulta(consultaData.nomeConsulta);
+        setInformacoesOrgao({
+          cnpj: consultaData.cnpj,
+          razaoSocial: consultaData.razaoSocial,
+          poderId: consultaData.poder,
+          esferaId: consultaData.esfera,
+        });
+        // Limpar o estado consultaId após carregar os dados
+        navigate('/contratos', { state: { consultaId: null } });
+      })
+      .catch((error) => {
+        toast.error("Erro ao carregar a consulta.");
+      });
+  }
 
-  // Lógica para obter os contratos da página atual
+  const valorTotal = listaContratos.reduce((total, contrato) => total + contrato.valorInicial, 0);
+
   const indiceInicial = (paginaAtual - 1) * contratosPorPagina;
-  const contratosPaginaAtual = contratos.slice(indiceInicial, indiceInicial + contratosPorPagina);
+  const contratosPaginaAtual = listaContratos.slice(indiceInicial, indiceInicial + contratosPorPagina);
 
-  const totalPaginas = Math.ceil(contratos.length / contratosPorPagina);
+  const totalPaginas = Math.ceil(listaContratos.length / contratosPorPagina);
 
   const handlePaginaAnterior = () => {
     if (paginaAtual > 1) {
@@ -46,11 +106,11 @@ const ContratoTable = () => {
   return (
     <TableContainer>
       <Title>{nomeConsulta || "Consulta"}</Title>
-      {orgaoInfo && (
+      {informacoesOrgao && (
         <OrgaoInfo>
-          <p>Órgão: {orgaoInfo.razaoSocial} (CNPJ: {formatCnpj(orgaoInfo.cnpj)})</p>
-          <p>Poder: {orgaoInfo.poderId}</p>
-          <p>Esfera: {orgaoInfo.esferaId}</p>
+          <p>Órgão: {informacoesOrgao.razaoSocial} (CNPJ: {formatCnpj(informacoesOrgao.cnpj)})</p>
+          <p>Poder: {mapPoderIdToName(informacoesOrgao.poderId)}</p>
+          <p>Esfera: {mapEsferaIdToName(informacoesOrgao.esferaId)}</p>
         </OrgaoInfo>
       )}
       <Description>Esta tabela exibe os contratos associados ao CNPJ informado.</Description>

@@ -10,41 +10,44 @@ function formatData(data) {
     return `${dia}/${mes}/${ano}`;
 }
 
-// Função para formatar CNPJ no formato xx.xxx.xxx/xxxx-xx
+function formatDataAtual() {
+    const data = new Date();
+    const dia = String(data.getDate()).padStart(2, '0');
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+}
+
 export function formatCnpj(cnpj) {
     return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
 }
 
-// Estrutura para armazenar dados dos contratos
 const ContratosContext = createContext({});
 
 export function ContratosProvider({ children }) {
-    const [contratos, setContratos] = useState([]);
-    const [orgaoInfo, setOrgaoInfo] = useState(null);
+    const [listaContratos, setListaContratos] = useState([]);
+    const [informacoesOrgao, setInformacoesOrgao] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [nomeConsulta, setNomeConsulta] = useState(""); // Adiciona estado para o nome da consulta
-    
-    // Função para abrir o modal
+    const [nomeConsulta, setNomeConsulta] = useState("");
+
     function handleOpenModal() {
         setIsModalOpen(true);
     }
 
-    // Função para fechar o modal
     function handleCloseModal() {
         setIsModalOpen(false);
     }
 
-    // Função para criar a consulta e fazer a requisição
     async function handleCreateConsulta(cnpjOrgao, dataInicial, dataFinal) {
         try {
-            setIsLoading(true); // Inicia o estado de carregamento
-            
-            const cnpjFormatado = formatCnpj(cnpjOrgao);
+            setIsLoading(true);
+            toast.info("Iniciando consulta...");
+
             const dataInicialFormatada = formatData(dataInicial);
             const dataFinalFormatada = formatData(dataFinal);
-            // Define o nome da consulta
-            const nomeConsulta = `Consulta: ${cnpjFormatado} - de ${dataInicialFormatada} até ${dataFinalFormatada}`;
+            const dataAtual = formatDataAtual();
+            const nomeConsulta = `Consulta realizada em: ${dataAtual} | Período: de ${dataInicialFormatada} até ${dataFinalFormatada}`;
             setNomeConsulta(nomeConsulta);
 
             const response = await fetchContratos(cnpjOrgao, dataInicial, dataFinal);
@@ -56,29 +59,29 @@ export function ContratosProvider({ children }) {
                     objeto: contrato.objetoContrato,
                     valorInicial: contrato.valorInicial,
                 }));
-                setContratos(contratosObtidos);
+                setListaContratos(contratosObtidos);
 
-                // Armazena as informações do órgão, supondo que todos os contratos vêm do mesmo órgão
                 if (response.data.length > 0) {
                     const orgao = response.data[0].orgaoEntidade;
-                    setOrgaoInfo({
+                    setInformacoesOrgao({
                         cnpj: orgao.cnpj,
                         razaoSocial: orgao.razaoSocial,
                         poderId: orgao.poderId,
                         esferaId: orgao.esferaId,
                     });
+                    // Enviar dados da consulta ao backend
+                    await enviarConsultaAoBackend(nomeConsulta, orgaoInfo, contratosObtidos);
                 }
                 toast.success("Consulta realizada com sucesso!");
             }
         } catch (error) {
             console.error("Erro ao buscar contratos:", error);
         } finally {
-            setIsLoading(false); // Encerra o estado de carregamento
+            setIsLoading(false);
             handleCloseModal();
         }
     }
 
-    // Função para buscar contratos da API
     async function fetchContratos(cnpjOrgao, dataInicial, dataFinal) {
         const url = `https://pncp.gov.br/api/consulta/v1/contratos`;
         const params = {
@@ -92,7 +95,6 @@ export function ContratosProvider({ children }) {
             const response = await axios.get(url, { params });
             return response.data;
         } catch (error) {
-            // Mapeia os códigos de erro específicos e exibe um toast apropriado
             if (error.response) {
                 switch (error.response.status) {
                     case 204:
@@ -108,7 +110,7 @@ export function ContratosProvider({ children }) {
                         toast.error("Entidade não processável. Verifique os dados fornecidos.");
                         break;
                     case 500:
-                        toast.error("Erro interno no servidor. Tente novamente mais tarde.");
+                        toast.error("Erro interno no servidor PNCP. Tente novamente mais tarde.");
                         break;
                     default:
                         toast.error(`Erro: ${error.response.data || "Ocorreu um erro inesperado."}`);
@@ -120,17 +122,57 @@ export function ContratosProvider({ children }) {
         }
     }
 
+    async function enviarConsultaAoBackend(nomeConsulta, orgaoInfo, contratosObtidos) {
+        try {
+            const consultaRequestDTO = {
+                nomeConsulta,
+                cnpj: orgaoInfo.cnpj,
+                razaoSocial: orgaoInfo.razaoSocial,
+                poder: orgaoInfo.poderId,
+                esfera: orgaoInfo.esferaId,
+                contratos: contratosObtidos.map(contrato => ({
+                    dataVigenciaInicial: contrato.dataVigenciaInicial,
+                    dataVigenciaFinal: contrato.dataVigenciaFinal,
+                    razaoSocialFornecedor: contrato.razaoSocialFornecedor,
+                    objeto: contrato.objeto,
+                    valorInicial: contrato.valorInicial,
+                })),
+            };
+
+            await axios.post("http://localhost:8080/api/consultas", consultaRequestDTO);
+            toast.success("Consulta salva no histórico com sucesso!");
+        } catch (error) {
+            console.error("Erro ao salvar a consulta no histórico:", error);
+            toast.error("Erro ao salvar a consulta no histórico.");
+        }
+    }
+
+    async function fetchConsultaById(id) {
+        try {
+            const response = await axios.get(`http://localhost:8080/api/consultas/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error("Erro ao buscar consulta:", error);
+            toast.error("Erro ao buscar consulta.");
+            throw error;
+        }
+    }
+
     return (
         <ContratosContext.Provider
             value={{
-                contratos,
-                orgaoInfo,
+                listaContratos,
+                informacoesOrgao,
                 isModalOpen,
                 isLoading,
-                nomeConsulta, 
+                nomeConsulta,
                 handleOpenModal,
                 handleCloseModal,
                 handleCreateConsulta,
+                fetchConsultaById,
+                setListaContratos,
+                setNomeConsulta,
+                setInformacoesOrgao,
             }}
         >
             {children}
