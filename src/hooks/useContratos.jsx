@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {api} from "../services/api";
 
 function formatData(data) {
     const ano = data.substring(0, 4);
@@ -139,7 +140,7 @@ export function ContratosProvider({ children }) {
                 })),
             };
 
-            await axios.post("http://localhost:8080/api/consultas", consultaRequestDTO);
+            const response = await api.post("/api/consultas", consultaRequestDTO);
             toast.success("Consulta salva no histórico com sucesso!");
         } catch (error) {
             console.error("Erro ao salvar a consulta no histórico:", error);
@@ -149,7 +150,7 @@ export function ContratosProvider({ children }) {
 
     async function fetchConsultaById(id) {
         try {
-            const response = await axios.get(`http://localhost:8080/api/consultas/${id}`);
+            const response = await api.get(`/api/consultas/${id}`);
             return response.data;
         } catch (error) {
             console.error("Erro ao buscar consulta:", error);

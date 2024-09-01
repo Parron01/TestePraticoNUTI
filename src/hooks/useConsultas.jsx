@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { api } from "../services/api";
 
 // Estrutura para armazenar dados das consultas
 const ConsultasContext = createContext({});
@@ -13,7 +13,7 @@ export function ConsultasProvider({ children }) {
     async function carregarConsultas() {
         setIsLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/api/consultas");
+            const response = await api.get("/api/consultas");
             const consultasFormatadas = response.data.map((consulta) => ({
                 id: consulta.id,
                 nomeConsulta: consulta.nomeConsulta,
@@ -30,7 +30,7 @@ export function ConsultasProvider({ children }) {
     // Função para deletar uma consulta do back-end
     async function deletarConsulta(consultaId) {
         try {
-            await axios.delete(`http://localhost:8080/api/consultas/${consultaId}`);
+            await api.delete(`/api/consultas/${consultaId}`);
             setListaConsultas((prevConsultas) =>
                 prevConsultas.filter((consulta) => consulta.id !== consultaId)
             );
