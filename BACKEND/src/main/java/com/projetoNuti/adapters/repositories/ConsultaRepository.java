@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
-    Optional<Consulta> findByNomeConsulta(String nomeConsulta);
+
 }
 

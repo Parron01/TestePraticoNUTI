@@ -1,5 +1,6 @@
 package com.projetoNuti.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -20,5 +21,6 @@ public class Contrato {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "consulta_id")
+    @JsonBackReference
     private Consulta consulta;
 }
