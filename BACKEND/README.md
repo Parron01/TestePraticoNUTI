@@ -76,6 +76,40 @@ Certifique-se de ter o Java 17 e o Docker instalados na sua máquina:
 
    A API estará disponível no endereço: [http://localhost:8080](http://localhost:8080)
 
+## Configuração de Ambiente Local
+
+Para rodar a aplicação localmente, será necessário alterar o perfil de ambiente no arquivo `application.properties` e certificar-se de que o banco de dados PostgreSQL está configurado corretamente. Siga os passos abaixo:
+
+1. **Altere o perfil de ambiente no `application.properties`:**
+
+   - Caminho: `src/main/resources/application.properties`
+
+   - Mude a referência para o arquivo de configuração de produção (`application-prod.properties`) para o arquivo de configuração de desenvolvimento (`application-dev.properties`).
+
+   - **Antes:**
+     ```properties
+     #spring.profiles.active=prod
+     spring.profiles.active=dev
+     ```
+
+   - **Depois:**
+     ```properties
+     spring.profiles.active=dev
+     #spring.profiles.active=prod
+     ```
+
+2. **Certifique-se de que o banco de dados PostgreSQL está rodando:**
+
+   - Se você estiver usando Docker, execute:
+     ```bash
+     docker-compose up -d
+     ```
+
+   - Isso garantirá que o banco de dados esteja rodando localmente, conforme configurado no arquivo `application-dev.properties`.
+
+3. **Faça a execução a mesma maneira como foi indicado anteriormente no tópico: `Instalação e Configuração`**
+
+
 ## Endpoints da API
 
 - **POST `/api/consultas`**: Cria uma nova consulta e armazena os contratos relacionados.

@@ -74,6 +74,34 @@ Certifique-se de ter o Node.js instalado na sua máquina:
 
    A aplicação estará disponível no endereço: [http://localhost:5173](http://localhost:5173)
 
+## Configuração de Ambiente Local
+
+Caso você esteja rodando a aplicação localmente, será necessário realizar uma pequena alteração no arquivo `api.js` para que as requisições sejam feitas para o backend local. Siga os passos abaixo:
+
+1. **Acesse o arquivo `api.js`:**
+
+   - Caminho: `src/services/api.js`
+
+2. **Comente a linha que contém a URL do backend em produção e descomente a linha do `localhost`:**
+
+   - **Antes:**
+     ```javascript
+     export const api = axios.create({
+         // baseURL: 'http://localhost:8080',
+         baseURL: 'https://testepraticonuti.onrender.com',
+     });
+     ```
+
+   - **Depois:**
+     ```javascript
+     export const api = axios.create({
+         baseURL: 'http://localhost:8080',
+         // baseURL: 'https://testepraticonuti.onrender.com',
+     });
+     ```
+
+3. **Salve o arquivo e rode a aplicação como indicado anteriormente.**
+
 
 ## Considerações Finais
 
