@@ -84,14 +84,38 @@ a{
     }
 }
 
+.Toastify__toast {
+    font-size: 1rem; 
+    padding: 16px 24px; 
+}
+
 .Toastify__toast--error {
     background: ${props => props.theme["red-700"]};
-    color: ${props=> props.theme["gray-100"]};
+    color: ${props => props.theme["gray-100"]};
 }
 
 .Toastify__toast--success {
     background: ${props => props.theme["green-500"]};
-    color: ${props=> props.theme["gray-100"]};
-  }
+    color: ${props => props.theme["gray-100"]};
+}
+
+.Toastify__toast--info {
+    background: ${props => props.theme["blue-600"]};
+    color: ${props => props.theme["gray-100"]};
+}
+
+@media (max-width: 768px) {
+    .Toastify__toast {
+        font-size: 0.875rem; 
+        padding: 12px 18px; 
+    }
+}
+
+@media (max-width: 480px) {
+    .Toastify__toast {
+        font-size: 0.75rem; 
+        padding: 10px 14px; 
+    }
+}
 
 `
