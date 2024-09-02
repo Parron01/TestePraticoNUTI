@@ -16,6 +16,8 @@ public class Contrato {
     private String dataVigenciaInicial;
     private String dataVigenciaFinal;
     private String razaoSocialFornecedor;
+
+    @Column(length = 1000)
     private String objetoContrato;
     private BigDecimal valorInicial;
 

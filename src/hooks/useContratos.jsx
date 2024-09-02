@@ -71,7 +71,7 @@ export function ContratosProvider({ children }) {
                         esferaId: orgao.esferaId,
                     });
                     // Enviar dados da consulta ao backend
-                    await enviarConsultaAoBackend(nomeConsulta, orgaoInfo, contratosObtidos);
+                    await enviarConsultaAoBackend(nomeConsulta, orgao, contratosObtidos);
                 }
                 toast.success("Consulta realizada com sucesso!");
             }
@@ -124,7 +124,9 @@ export function ContratosProvider({ children }) {
     }
 
     async function enviarConsultaAoBackend(nomeConsulta, orgaoInfo, contratosObtidos) {
+        console.log("entrou")
         try {
+            console.log("entrou2")
             const consultaRequestDTO = {
                 nomeConsulta,
                 cnpj: orgaoInfo.cnpj,
@@ -139,7 +141,7 @@ export function ContratosProvider({ children }) {
                     valorInicial: contrato.valorInicial,
                 })),
             };
-
+            console.log(consultaRequestDTO)
             const response = await api.post("/api/consultas", consultaRequestDTO);
             toast.success("Consulta salva no histórico com sucesso!");
         } catch (error) {

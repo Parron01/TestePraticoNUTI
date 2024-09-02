@@ -37,7 +37,6 @@ export function ConsultasProvider({ children }) {
             toast.success("Consulta deletada com sucesso.");
         } catch (error) {
             console.error("Erro ao deletar consulta:", error);
-            toast.error("Erro ao deletar a consulta.");
         }
     }
 
