@@ -13,13 +13,15 @@ import {
   PaginationContainer,
   PaginationButton,
   DeleteButton,
-  Description
+  Description,
 } from './HistoricoConsultasTable.styles';
 import { useConsultas } from '../../hooks/useConsultas';
+import LoadingOverlay from '../LoadingOverlay/LoadingOverlay';
 
 const HistoricoConsultasTable = () => {
-  const { listaConsultas = [], deletarConsulta, isLoading , carregarConsultas} = useConsultas();
+  const { listaConsultas = [], deletarConsulta, isLoading, carregarConsultas } = useConsultas();
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [isDeleting, setIsDeleting] = useState(false); // Novo estado para controlar o loading ao deletar
   const consultasPorPagina = 5;
   const navigate = useNavigate();
 
@@ -48,14 +50,20 @@ const HistoricoConsultasTable = () => {
     navigate('/contratos', { state: { consultaId } });
   };
 
-  const handleDeleteClick = (consultaId) => {
+  const handleDeleteClick = async (consultaId) => {
     if (window.confirm("Tem certeza que deseja deletar esta consulta?")) {
-      deletarConsulta(consultaId);
+      setIsDeleting(true); // Ativa o loading ao deletar
+      await deletarConsulta(consultaId);
+      setIsDeleting(false); // Desativa o loading após deletar
     }
   };
 
   if (isLoading) {
-    return <p>Carregando...</p>;
+    return <LoadingOverlay message="Carregando, isso pode demorar um pouco (50s+)" />;
+  }
+
+  if (isDeleting) {
+    return <LoadingOverlay message="Deletando..." />;
   }
 
   return (

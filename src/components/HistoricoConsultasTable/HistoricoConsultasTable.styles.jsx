@@ -9,6 +9,8 @@ export const TableContainer = styled.div`
   overflow-x: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
 
+  position: relative;
+
   @media (max-width: 1024px) { 
     margin: 0 1rem;
     width: 98%;
