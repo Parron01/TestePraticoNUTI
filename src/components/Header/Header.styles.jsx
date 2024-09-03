@@ -38,6 +38,7 @@ export const MobileNavLinks = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 1rem;
   gap: 1rem;
+  z-index: 1000;
 
   @media (min-width: 769px) {
     display: none; 
