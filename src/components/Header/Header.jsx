@@ -6,25 +6,30 @@ import { useContratos } from '../../hooks/useContratos';
 import { ConsultaModal } from '../ConsultaModal/ConsultaModal';
 
 const Header = () => {
-  const location = useLocation();
+  const location = useLocation(); 
   const navigate = useNavigate();
-  const { handleOpenModal } = useContratos();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { handleOpenModal } = useContratos(); // Função para abrir o modal de consulta, obtida a partir do hook customizado
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar a visibilidade do menu mobile
 
+  // Função para manipular o clique em um link de navegação
   const handleLinkClick = (href) => {
     navigate(href);
-    setIsMenuOpen(false); // Fecha o menu ao clicar em um link
+    setIsMenuOpen(false);
   };
 
+  // Função para alternar a visibilidade do menu mobile
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
     <HeaderContainer>
+      {/* Ícone de menu hamburguer para telas mobile */}
       <HamburgerMenu onClick={toggleMenu}>
         <List size={32} />
       </HamburgerMenu>
+
+      {/* Links de navegação para telas maiores */}
       <NavLinks>
         <NavLink onClick={() => handleLinkClick("/")}>Home</NavLink>
         <Divider />
@@ -32,11 +37,15 @@ const Header = () => {
         <Divider />
         <NavLink onClick={() => handleLinkClick("/historico-consultas")}>Histórico Consultas</NavLink>
       </NavLinks>
+
+      {/* Botão para abrir o modal de consulta, visível apenas na rota de contratos */}
       {location.pathname === '/contratos' && (
         <AddConsultButton onClick={handleOpenModal}>
           Realizar Consulta <Plus size={20} weight="bold" />
         </AddConsultButton>
       )}
+
+      {/* Menu mobile visível apenas quando o estado isMenuOpen for true */}
       {isMenuOpen && (
         <MobileNavLinks>
           <NavLink onClick={() => handleLinkClick("/")}>Home</NavLink>
@@ -44,6 +53,8 @@ const Header = () => {
           <NavLink onClick={() => handleLinkClick("/historico-consultas")}>Histórico Consultas</NavLink>
         </MobileNavLinks>
       )}
+
+      {/* Componente de modal para realizar consultas */}
       <ConsultaModal />
     </HeaderContainer>
   );

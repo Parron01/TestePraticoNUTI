@@ -2,8 +2,9 @@ import React, { createContext, useContext, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {api} from "../services/api";
+import { api } from "../services/api";
 
+// Funções utilitárias para formatação de datas e CNPJ
 function formatData(data) {
     const ano = data.substring(0, 4);
     const mes = data.substring(4, 6);
@@ -23,15 +24,18 @@ export function formatCnpj(cnpj) {
     return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
 }
 
+// Criação do contexto para gerenciar o estado dos contratos
 const ContratosContext = createContext({});
 
 export function ContratosProvider({ children }) {
+    // Estados para gerenciar as informações relacionadas aos contratos
     const [listaContratos, setListaContratos] = useState([]);
     const [informacoesOrgao, setInformacoesOrgao] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [nomeConsulta, setNomeConsulta] = useState("");
 
+    // Funções para abrir e fechar o modal
     function handleOpenModal() {
         setIsModalOpen(true);
     }
@@ -40,19 +44,23 @@ export function ContratosProvider({ children }) {
         setIsModalOpen(false);
     }
 
+    // Função para realizar a consulta de contratos
     async function handleCreateConsulta(cnpjOrgao, dataInicial, dataFinal) {
         try {
             setIsLoading(true);
             toast.info("Iniciando consulta...");
 
+            // Formatação das datas para o formato esperado pela API
             const dataInicialFormatada = formatData(dataInicial);
             const dataFinalFormatada = formatData(dataFinal);
             const dataAtual = formatDataAtual();
             const nomeConsulta = `Consulta realizada em: ${dataAtual} | Período: de ${dataInicialFormatada} até ${dataFinalFormatada}`;
             setNomeConsulta(nomeConsulta);
 
+            // Requisição à API para buscar os contratos
             const response = await fetchContratos(cnpjOrgao, dataInicial, dataFinal);
             if (response && response.data) {
+                // Mapeamento dos contratos obtidos para o formato esperado
                 const contratosObtidos = response.data.map(contrato => ({
                     dataVigenciaInicial: contrato.dataVigenciaInicio,
                     dataVigenciaFinal: contrato.dataVigenciaFim,
@@ -62,6 +70,7 @@ export function ContratosProvider({ children }) {
                 }));
                 setListaContratos(contratosObtidos);
 
+                // Se houver contratos, as informações do órgão são salvas e enviadas ao backend
                 if (response.data.length > 0) {
                     const orgao = response.data[0].orgaoEntidade;
                     setInformacoesOrgao({
@@ -70,7 +79,7 @@ export function ContratosProvider({ children }) {
                         poderId: orgao.poderId,
                         esferaId: orgao.esferaId,
                     });
-                    // Enviar dados da consulta ao backend
+                    // Enviar os dados da consulta ao backend
                     await enviarConsultaAoBackend(nomeConsulta, orgao, contratosObtidos);
                 }
                 toast.success("Consulta realizada com sucesso!");
@@ -83,6 +92,7 @@ export function ContratosProvider({ children }) {
         }
     }
 
+    // Função para buscar contratos na API do PNCP
     async function fetchContratos(cnpjOrgao, dataInicial, dataFinal) {
         const url = `https://pncp.gov.br/api/consulta/v1/contratos`;
         const params = {
@@ -96,6 +106,7 @@ export function ContratosProvider({ children }) {
             const response = await axios.get(url, { params });
             return response.data;
         } catch (error) {
+            // Tratamento de erros e notificação ao usuário
             if (error.response) {
                 switch (error.response.status) {
                     case 204:
@@ -123,10 +134,9 @@ export function ContratosProvider({ children }) {
         }
     }
 
+    // Função para enviar os dados da consulta ao backend
     async function enviarConsultaAoBackend(nomeConsulta, orgaoInfo, contratosObtidos) {
-        console.log("entrou")
         try {
-            console.log("entrou2")
             const consultaRequestDTO = {
                 nomeConsulta,
                 cnpj: orgaoInfo.cnpj,
@@ -141,7 +151,6 @@ export function ContratosProvider({ children }) {
                     valorInicial: contrato.valorInicial,
                 })),
             };
-            console.log(consultaRequestDTO)
             const response = await api.post("/api/consultas", consultaRequestDTO);
             toast.success("Consulta salva no histórico com sucesso!");
         } catch (error) {
@@ -150,6 +159,7 @@ export function ContratosProvider({ children }) {
         }
     }
 
+    // Função para buscar uma consulta específica pelo ID
     async function fetchConsultaById(id) {
         try {
             const response = await api.get(`/api/consultas/${id}`);
@@ -161,6 +171,7 @@ export function ContratosProvider({ children }) {
         }
     }
 
+    // Provedor do contexto para compartilhar os estados e funções com outros componentes
     return (
         <ContratosContext.Provider
             value={{
@@ -183,6 +194,7 @@ export function ContratosProvider({ children }) {
     );
 }
 
+// Hook personalizado para acessar o contexto de Contratos
 export function useContratos() {
     const context = useContext(ContratosContext);
 

@@ -1,4 +1,4 @@
-import Modal from 'react-modal'; // Importe o Modal
+import Modal from 'react-modal'; // Importa o componente Modal para diálogos modais
 import { ThemeProvider } from "styled-components";
 import { GlobalStyle } from "./styles/global";
 import { defaultTheme } from "./styles/themes/default";
@@ -7,17 +7,17 @@ import { Router } from "./Router";
 import { ContratosProvider } from "./hooks/useContratos";
 import { ConsultasProvider } from './hooks/useConsultas';
 
-// Defina o elemento principal da aplicação para acessibilidade
+// Define o elemento principal da aplicação para acessibilidade, necessário para o funcionamento do react-modal
 Modal.setAppElement('#root');
 
 function App() {
   return (
     <BrowserRouter>
-      <ContratosProvider>
-        <ConsultasProvider>
-          <ThemeProvider theme={defaultTheme}>
-            <Router />
-            <GlobalStyle />
+      <ContratosProvider> {/* Fornece o contexto dos contratos para toda a aplicação */}
+        <ConsultasProvider> {/* Fornece o contexto das consultas para toda a aplicação */}
+          <ThemeProvider theme={defaultTheme}> {/* Aplica o tema padrão definido para a aplicação */}
+            <Router /> {/* Gerencia as rotas da aplicação */}
+            <GlobalStyle /> {/* Aplica os estilos globais */}
           </ThemeProvider>
         </ConsultasProvider>
       </ContratosProvider>

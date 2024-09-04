@@ -19,21 +19,25 @@ import { useConsultas } from '../../hooks/useConsultas';
 import LoadingOverlay from '../LoadingOverlay/LoadingOverlay';
 
 const HistoricoConsultasTable = () => {
-  const { listaConsultas = [], deletarConsulta, isLoading, carregarConsultas } = useConsultas();
-  const [paginaAtual, setPaginaAtual] = useState(1);
+  const { listaConsultas = [], deletarConsulta, isLoading, carregarConsultas } = useConsultas(); // Hook customizado para gerenciar estado e operações relacionadas a consultas
+  const [paginaAtual, setPaginaAtual] = useState(1); // Estado para controlar a página atual da tabela
   const [isDeleting, setIsDeleting] = useState(false); // Novo estado para controlar o loading ao deletar
-  const consultasPorPagina = 5;
-  const navigate = useNavigate();
+  const consultasPorPagina = 5; // Número de consultas a serem exibidas por página
+  const navigate = useNavigate(); // Hook para navegação programática
 
+  // Carregar as consultas ao montar o componente
   useEffect(() => {
     carregarConsultas();
   }, []);
 
+  // Determinar o índice inicial e selecionar as consultas para a página atual
   const indiceInicial = (paginaAtual - 1) * consultasPorPagina;
   const consultasPaginaAtual = listaConsultas.slice(indiceInicial, indiceInicial + consultasPorPagina);
 
+  // Calcular o total de páginas
   const totalPaginas = Math.ceil(listaConsultas.length / consultasPorPagina);
 
+  // Navegação entre páginas
   const handlePaginaAnterior = () => {
     if (paginaAtual > 1) {
       setPaginaAtual(paginaAtual - 1);
@@ -46,10 +50,12 @@ const HistoricoConsultasTable = () => {
     }
   };
 
+  // Navegar para a página de detalhes da consulta selecionada
   const handleConsultaClick = (consultaId) => {
     navigate('/contratos', { state: { consultaId } });
   };
 
+  // Excluir uma consulta com confirmação e exibir um loading durante o processo
   const handleDeleteClick = async (consultaId) => {
     if (window.confirm("Tem certeza que deseja deletar esta consulta?")) {
       setIsDeleting(true); // Ativa o loading ao deletar
@@ -58,10 +64,12 @@ const HistoricoConsultasTable = () => {
     }
   };
 
+  // Exibe um overlay de carregamento se as consultas estiverem sendo carregadas
   if (isLoading) {
-    return <LoadingOverlay message="Carregando, isso pode demorar um pouco (50s+)" />;
+    return <LoadingOverlay message="Carregando... Isso pode levar um tempo..(50s+)" />;
   }
 
+  // Exibe um overlay de carregamento ao deletar uma consulta
   if (isDeleting) {
     return <LoadingOverlay message="Deletando..." />;
   }
@@ -70,6 +78,7 @@ const HistoricoConsultasTable = () => {
     <TableContainer>
       <Title>Histórico de Consultas</Title>
       <Description>Esta tabela exibe o histórico de todas as consultas feitas e armazenadas.</Description>
+      <Description>Clique para ver mais informações sobre a consulta.</Description>
       <Table>
         <TableHeader>
           <TableHeaderRow>
