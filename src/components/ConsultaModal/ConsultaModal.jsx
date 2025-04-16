@@ -3,9 +3,10 @@ import {
     ConsultaModalContainer,
     LoadingSpinner,
     SendButton,
+    CopyButton,
 } from "./ConsultaModal.styles";
 import { IoMdClose } from "react-icons/io";
-import { FaBuilding, FaCalendarAlt } from "react-icons/fa";
+import { FaBuilding, FaCalendarAlt, FaCopy, FaCheck } from "react-icons/fa";
 import { useContratos } from "../../hooks/useContratos";
 import { useState } from "react";
 
@@ -23,6 +24,21 @@ export function ConsultaModal() {
     const [cnpj, setCnpj] = useState("");          // Armazena o CNPJ inserido pelo usuário
     const [dataInicio, setDataInicio] = useState("");  // Armazena a data de início inserida pelo usuário
     const [dataFim, setDataFim] = useState("");    // Armazena a data de fim inserida pelo usuário
+
+    // Estado para feedback do botão de copiar
+    const [copied, setCopied] = useState(false);
+    const cnpjExemplo = "46341038000129";
+
+    // Função para copiar o CNPJ de exemplo
+    const handleCopyCnpj = async () => {
+        try {
+            await navigator.clipboard.writeText(cnpjExemplo);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        } catch (e) {
+            console.error("Falha ao copiar:", e);
+        }
+    };
 
     // Função que lida com a submissão do formulário de consulta
     async function handleConsultar(event) {
@@ -75,8 +91,16 @@ export function ConsultaModal() {
                         value={cnpj}
                         onChange={(event) => setCnpj(event.target.value)}
                     />
-                    <label>
-                    <span>CNPJ de Exemplo= 46341038000129</span>
+                    <label className="cnpj-example" >
+                        <span style={{ cursor: "pointer" }}>CNPJ de Exemplo= {cnpjExemplo}</span>
+                        <CopyButton 
+                            type="button" 
+                            onClick={handleCopyCnpj} 
+                            $copied={copied}
+                            title={copied ? "Copiado!" : "Copiar CNPJ"}
+                        >
+                            {copied ? <FaCheck /> : <FaCopy />}
+                        </CopyButton>
                     </label>
                 </div>
 

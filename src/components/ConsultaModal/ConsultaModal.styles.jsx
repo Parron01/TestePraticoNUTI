@@ -32,7 +32,13 @@ export const ConsultaModalContainer = styled.form`
     border-left: 1px solid ${(props) => props.theme["green-600"]};
     border-radius: 5px;
     color: ${(props) => props.theme["green-300"]};
-}
+    display: flex;
+    align-items: center;
+  }
+  
+  .cnpj-example {
+    align-items: center;
+  }
 `;
 
 export const SendButton = styled.button`
@@ -78,5 +84,24 @@ export const LoadingSpinner = styled.div`
     100% {
       transform: rotate(360deg);
     }
+  }
+`;
+
+export const CopyButton = styled.button`
+  background: transparent;
+  border: none;
+  color: ${(props) => props.$copied ? props.theme["green-500"] : props.theme["blue-500"]};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  margin-bottom: 33px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  
+  &:hover {
+    color: ${(props) => props.$copied ? props.theme["green-300"] : props.theme["blue-300"]};
+    transform: scale(1.1);
   }
 `;
