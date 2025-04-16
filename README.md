@@ -1,6 +1,7 @@
 # Processo Seletivo NUTI - Frontend
 
 Este projeto foi desenvolvido como parte de um teste técnico para um processo seletivo da NUTI. O objetivo é fornecer uma solução para a consulta de contratos de órgãos públicos utilizando a API do Portal Nacional de Contratações Públicas (PNCP).
+Atualmente, a aplicação está disponível para visualização do seu funcionamento no link a seguir: [https://teste-pratico-nuti.vercel.app/](https://teste-pratico-nuti.vercel.app/)
 
 
 ## Tecnologias Utilizadas
