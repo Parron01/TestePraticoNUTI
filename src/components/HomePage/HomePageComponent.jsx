@@ -10,6 +10,7 @@ import {
   Content
 } from './HomePageComponent.styles';
 import { useNavigate } from 'react-router-dom';
+import { FloatingButton } from '../FloatingButton/FloatingButton';
 
 
 const HomePageComponent = () => {
@@ -22,6 +23,7 @@ const HomePageComponent = () => {
 
   return (
     <Container>
+      <FloatingButton/>
       <Content>
       <Header>
         <Title>Bem Vindo ao Portal de Consulta de Contratos Públicos!</Title>

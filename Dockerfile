@@ -10,7 +10,7 @@ COPY . .
 RUN npm run build
 
 # Etapa de produção
-FROM nginx:1.23-alpine3.17alpine AS production
+FROM nginx:alpine AS production
 
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
